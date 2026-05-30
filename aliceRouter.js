@@ -1,0 +1,45 @@
+/**
+ * Alice Router
+ * A minimalist, vanilla JS router for local-first applications.
+ * Aesthetic: Dark Academia / Industrial
+ */
+const Alice = {
+  routes: {},
+  root: document.getElementById('app'),
+
+  // Register a route: Alice.on('/', () => renderHome())
+  on(path, callback) {
+    this.routes[path] = callback;
+  },
+
+  // Navigate programmatically
+  navigate(path) {
+    window.history.pushState({}, '', path);
+    this.handleRouting();
+  },
+
+  handleRouting() {
+    const path = window.location.pathname;
+    const action = this.routes[path] || this.routes['/404'];
+    if (action) action();
+  },
+
+  init() {
+    window.addEventListener('popstate', () => this.handleRouting());
+    
+    // Intercept clicks for seamless "Alice-style" transitions
+    document.addEventListener('click', (e) => {
+      if (e.target.matches('[data-alice]')) {
+        e.preventDefault();
+        this.navigate(e.target.getAttribute('href'));
+      }
+    });
+
+    this.handleRouting();
+  }
+};
+
+// --- Usage Example ---
+Alice.on('/', () => { Alice.root.innerHTML = '<h1>Down the Rabbit Hole</h1>'; });
+Alice.on('/shop', () => { Alice.root.innerHTML = '<h1>The Shop</h1>'; });
+Alice.init();
